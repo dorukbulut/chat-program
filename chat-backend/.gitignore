@@ -1,0 +1,3 @@
+fastapi-env/
+tests/
+*__pycache__/

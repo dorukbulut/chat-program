@@ -1,0 +1,1 @@
+VERSION_1 = "/api/v1"
