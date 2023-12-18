@@ -14,6 +14,8 @@ class User(Base):
     surname = Column(String, index=True)
     password = Column(String)
 
+    blacklists = relationship('Blacklist', back_populates='user')
+
 
 
     

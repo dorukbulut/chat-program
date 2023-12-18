@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
-from fastapi import Depends
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, Token, UserLogin
+from app.models.token import Blacklist
+from app.schemas.user import UserCreate, UserLogin, Token, UserLogin, UserDeleteRequest
 from fastapi.security import OAuth2PasswordRequestForm
 from app.utils.gen_token import *
 from typing import Annotated
-
+from app.utils.get_db import get_db
+import time
 
 def create_user(db: Session, new_user: UserCreate):
     # Check if the username already exists
@@ -50,14 +51,37 @@ def auth_user(username: str, password:str , db):
     return existing_user
 
 
+
+def revoke_token(user: UserDeleteRequest , db):
+    token =  db.query(Blacklist).filter(Blacklist.token == user.token).first()
+    if token is None:
+        raise ValueError("Invalid Token !")
+    token.revoked = True
+    
+    db.commit()
+def check_user_auth(token: Annotated[str, Depends(oauth2_bearer)], db: Annotated[Session, Depends(get_db)]):
+    user = get_current_user(token)
+    if user is not None:
+        if db.query(Blacklist).filter(Blacklist.revoked == True, Blacklist.user_id == user.get('id'), Blacklist.token == token).first():
+            raise HTTPException(status_code=401, detail="Invalid Token!")
+        else:
+            return user.get('sub')
+    else:
+        raise HTTPException(status_code=401, detail="Invalid Token!")
+
+def delete_entry(db, token):
+    time.sleep(3700)
+    db.query(Blacklist).filter(Blacklist.token == token).delete()
+    db.commit()
+
+
 def login_for_access_token(form_data : UserLogin, db):
     user = auth_user(form_data.username, form_data.password, db)
     if not user:
         raise ValueError("Invalid credentials")
     
-    token = create_access_token(user.username, str(user.id), timedelta(minutes=45))
-
-    return {"access_token" : token, "token_type" : "bearer"}
+    token = create_access_token(db, user.username, str(user.id), timedelta(minutes=60))
+    return {"access_token" : token, "token_type" : "bearer", "username": form_data.username}
 
 
 

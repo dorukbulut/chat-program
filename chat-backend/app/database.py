@@ -18,7 +18,7 @@ Base = declarative_base()
 
 # Import your models here so that they are registered with SQLAlchemy
 from app.models.user import User
-
+from app.models.token import Blacklist
 # Create tables in the database
 def create_tables():
     try:
@@ -26,8 +26,8 @@ def create_tables():
         with engine.connect() as connection:
             print("PostgreSQL Database connection successful")
 
-        #Drop All --comment on development
-        Base.metadata.drop_all(bind=engine)
+        # Drop All Tables (including those with relationships)
+        Base.metadata.drop_all(bind=engine, checkfirst=False)
         # Create tables
         Base.metadata.create_all(bind=engine)
         logging.info("Tables created successfully")
