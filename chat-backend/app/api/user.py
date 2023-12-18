@@ -10,6 +10,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(check_user_auth)]
 router = APIRouter()
 
+
+
 @router.post("/login", response_model=Token)
 async def login(form_data : UserLogin, db: db_dependency, background_tasks: BackgroundTasks):
     try:
@@ -49,7 +51,14 @@ async def get_user(username : str, user_dep: user_dependency, db: db_dependency)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
 
-
+@router.get("/get-userlist/{username}")
+async def get_user_list(username, user_dep: user_dependency, db: db_dependency):
+    try:
+        userList = get_user_list(db, username)
+        
+        return userList
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
 @router.post("/revoke")
 async def get_user(user : UserDeleteRequest, user_dep: user_dependency, db: db_dependency):
     try:

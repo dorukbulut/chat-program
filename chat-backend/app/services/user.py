@@ -85,4 +85,5 @@ def login_for_access_token(form_data : UserLogin, db):
 
 
 
-
+def get_user_list(db, username:str):
+    pass 

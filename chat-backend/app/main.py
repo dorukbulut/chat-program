@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from app.api.user import router as UserRouter
+from app.api.chat import router as ChatRouter
 from dotenv import load_dotenv
 from app.utils import get_db
 from app.database import create_tables
@@ -16,12 +17,15 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins="*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+
 #routes
 app.include_router(UserRouter, prefix=f"{VERSION_1}/user")
+app.include_router(ChatRouter, prefix=f"{VERSION_1}/chat")
+

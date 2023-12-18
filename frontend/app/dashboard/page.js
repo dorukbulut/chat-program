@@ -2,6 +2,7 @@
 import { useAxios } from "@/hooks";
 import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { MessageBox, MessagePreview, NoSelectPreview } from "@/components";
 export default function Dashboard() {
   const [user, setUser] = useState({
     name: "",
@@ -224,130 +225,12 @@ export default function Dashboard() {
       <section className="grid grid-cols-8 h-screen bg-[#31304D] rounded-xl">
         <div className="flex flex-col gap-10 col-span-2 border-r-[#161A30] p-5 border-r-2 border-opacity-25">
           <p className="font-bold text-[#B6BBC4] tracking-wider">Messages</p>
-          <div className="space-y-3">
-            <div className="bg-[#161A30] p-3 rounded-lg flex items-center place-content-between">
-              <div className="flex gap-5 items-center ">
-                <svg
-                  id="Layer_1"
-                  data-name="Layer 1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 25 25"
-                  style={{ width: "50px", height: "50px" }}
-                >
-                  <title>Profile</title>
-                  <path
-                    id="User_Circle"
-                    data-name="User Circle"
-                    d="M12.5,25A12.5,12.5,0,1,1,25,12.5,12.51,12.51,0,0,1,12.5,25ZM4.75,21a11.48,11.48,0,0,0,15.5,0c-.69-1.58-2.71-2.42-4.34-3.09S14,16.3,14,15.5a3,3,0,0,1,.93-2.12,3.41,3.41,0,0,0,1.14-2.64A3.51,3.51,0,0,0,12.5,7,3.44,3.44,0,0,0,9,10.74a3.35,3.35,0,0,0,1.08,2.64A3,3,0,0,1,11,15.5c0,.8-.22,1.7-1.84,2.36S5.44,19.41,4.75,21ZM12.5,6a4.5,4.5,0,0,1,4.57,4.74,4.38,4.38,0,0,1-1.48,3.39A2,2,0,0,0,15,15.5c0,.44,0,.94,1.21,1.44,1.68.7,3.82,1.59,4.78,3.31a11.5,11.5,0,1,0-17,0C5,18.53,7.1,17.64,8.7,17,10,16.44,10,15.92,10,15.5a2,2,0,0,0-.56-1.37A4.36,4.36,0,0,1,8,10.74,4.41,4.41,0,0,1,12.5,6Z"
-                    fill="#B6BBC4"
-                  ></path>
-                </svg>
-                <div>
-                  <p className="font-extrabold opacity-75 tracking-wide">
-                    Enes Sevim
-                  </p>
-                  <p className="font-extrabold text-sm">
-                    Enes: Bırak bu işleri.
-                  </p>
-                </div>
-              </div>
-              <svg
-                version="1.1"
-                id="Capa_1"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                x="0px"
-                y="0px"
-                viewBox="0 0 54 54"
-                style={{
-                  enableBackground: "new 0 0 54 54",
-                  width: "25px",
-                  height: "25px",
-                }}
-                xmlSpace="preserve"
-              >
-                <path
-                  style={{ fill: "#43B05C" }}
-                  d="M43.5,19c-4.971,0-9-4.029-9-9c0-0.688,0.084-1.356,0.231-2H4.735C2.396,8,0.5,9.896,0.5,12.235
-        v37.53C0.5,52.104,2.396,54,4.735,54h37.53c2.339,0,4.235-1.896,4.235-4.235V18.477C45.56,18.81,44.554,19,43.5,19z"
-                ></path>
-                <circle
-                  style={{
-                    fill: "#DD352E",
-                    stroke: "#FFFFFF",
-                    strokeWidth: 2,
-                    strokeLinecap: "round",
-                    strokeMiterlimit: 10,
-                  }}
-                  cx="43.5"
-                  cy="10"
-                  r="9"
-                ></circle>
-                {/* Add additional elements or groups if needed */}
-              </svg>
-            </div>
-
-            <div className="bg-[#161A30] p-3 rounded-lg flex items-center place-content-between">
-              <div className="flex gap-5 items-center ">
-                <svg
-                  id="Layer_1"
-                  data-name="Layer 1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 25 25"
-                  style={{ width: "50px", height: "50px" }}
-                >
-                  <title>Profile</title>
-                  <path
-                    id="User_Circle"
-                    data-name="User Circle"
-                    d="M12.5,25A12.5,12.5,0,1,1,25,12.5,12.51,12.51,0,0,1,12.5,25ZM4.75,21a11.48,11.48,0,0,0,15.5,0c-.69-1.58-2.71-2.42-4.34-3.09S14,16.3,14,15.5a3,3,0,0,1,.93-2.12,3.41,3.41,0,0,0,1.14-2.64A3.51,3.51,0,0,0,12.5,7,3.44,3.44,0,0,0,9,10.74a3.35,3.35,0,0,0,1.08,2.64A3,3,0,0,1,11,15.5c0,.8-.22,1.7-1.84,2.36S5.44,19.41,4.75,21ZM12.5,6a4.5,4.5,0,0,1,4.57,4.74,4.38,4.38,0,0,1-1.48,3.39A2,2,0,0,0,15,15.5c0,.44,0,.94,1.21,1.44,1.68.7,3.82,1.59,4.78,3.31a11.5,11.5,0,1,0-17,0C5,18.53,7.1,17.64,8.7,17,10,16.44,10,15.92,10,15.5a2,2,0,0,0-.56-1.37A4.36,4.36,0,0,1,8,10.74,4.41,4.41,0,0,1,12.5,6Z"
-                    fill="#B6BBC4"
-                  ></path>
-                </svg>
-                <div>
-                  <p className="font-extrabold opacity-75 tracking-wide">
-                    Deniz Türk
-                  </p>
-                  <p className="font-extrabold opacity-50 text-sm">
-                    Siz: Havelsan Nası.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="space-y-5">
+            <MessagePreview name={"Onat"} surname={"Engin"} />
+            <MessagePreview name={"Deniz"} surname={"Türk"} />
           </div>
         </div>
-        <div className="flex flex-col gap-5 items-center justify-center col-span-6 p-5">
-          <div>
-            <p className="text-2xl text-[#B6BBC4] tracking-wide font-extrabold">
-              Welcome to the chat app!
-            </p>
-            <p className=" mt-4 text-gray-400">
-              Your conversations will be displayed here.
-            </p>
-          </div>
-
-          <svg
-            version="1.1"
-            id="Layer_1"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
-            x="0px"
-            y="0px"
-            viewBox="0 0 100.353 100.353"
-            style={{
-              enableBackground: "new 0 0 100.353 100.353",
-              fill: "#231F20",
-            }}
-            xmlSpace="preserve"
-            width="100" // Adjust the width as needed
-            height="100" // Adjust the height as needed
-          >
-            <path
-              style={{ fill: "#B6BBC4" }}
-              d="M92.016 18.026H55.518c-2.857 0-5.181 2.324-5.181 5.181v4.354H9.46c-3.669 0-6.654 2.985-6.654 6.655v30.723c0 3.668 2.985 6.652 6.654 6.652h6.391v12.884c0 0.594 0.35 1.131 0.893 1.372c0.195 0.086 0.401 0.128 0.606 0.128c0.366 0 0.728-0.134 1.009-0.39l15.403-13.994h26.804c3.668 0 6.653-2.984 6.653-6.652v-14.61h7.273l10.877 9.881c0.282 0.256 0.643 0.39 1.009 0.39c0.205 0 0.412-0.042 0.607-0.128c0.543-0.24 0.893-0.778 0.893-1.372v-8.771h4.137c2.855 0 5.178-2.325 5.178-5.182v-21.94C97.194 20.35 94.872 18.026 92.016 18.026zM64.22 64.938c0 2.014-1.639 3.652-3.653 3.652H33.183c-0.373 0-0.732 0.139-1.009 0.39L18.85 81.085V70.09c0-0.829-0.671-1.5-1.5-1.5H9.459c-2.015 0-3.654-1.638-3.654-3.652V34.215c0-2.015 1.639-3.655 3.654-3.655h42.363c0.005 0 0.01 0.001 0.015 0.001s0.01-0.001 0.015-0.001h8.715c2.015 0 3.653 1.64 3.653 3.655L64.22 64.938L64.22 64.938zM94.194 45.147c0 1.203-0.977 2.182-2.178 2.182h-5.637c-0.828 0-1.5 0.671-1.5 1.5v6.882l-8.798-7.992c-0.276-0.25-0.636-0.39-1.009-0.39h-7.853V34.216c0-3.669-2.985-6.655-6.653-6.655h-7.229v-4.354c0-1.203 0.979-2.181 2.181-2.181h36.498c1.201 0 2.178 0.978 2.178 2.181V45.147z"
-            />
-          </svg>
-        </div>
+        <MessageBox />
       </section>
     </main>
   );
