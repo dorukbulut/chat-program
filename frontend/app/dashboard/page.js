@@ -10,6 +10,8 @@ export default function Dashboard() {
     username: "",
   });
 
+  const [usersList, setUsersList] = useState([]);
+
   const { data } = useSession({
     required: true,
   });
@@ -18,13 +20,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       api
         .get(`/user/get/${data.user.username}`)
-        .then((res) => {
-          setUser(res.data);
+        .then(async (res) => {
+          setUser(res.data.userResp);
+          setUsersList(res.data.friendList);
         })
-        .catch((err) => console.log(err));
+        .catch(
+          async (err) =>
+            await signOut({
+              callbackUrl: "http://localhost:3000/login",
+              redirect: true,
+            })
+        );
     }
   }, [data]);
   const Logout = async (e) => {
@@ -39,9 +47,11 @@ export default function Dashboard() {
         callbackUrl: "http://localhost:3000/login",
         redirect: true,
       });
-      destroyAuth();
     } catch (error) {
-      console.log(error);
+      await signOut({
+        callbackUrl: "http://localhost:3000/login",
+        redirect: true,
+      });
     }
   };
   return (
@@ -133,81 +143,9 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="max-w-md mx-auto flex items-center   bg-[#161A30] rounded-lg shadow">
-            <svg
-              style={{ width: "70px", height: "70px" }}
-              version="1.1"
-              className="ml-5 mr-2"
-              viewBox="0 0 129 129"
-              enableBackground="new 0 0 129 129"
-            >
-              <g>
-                <path
-                  className="fill-current text-gray-500"
-                  d="M51.6,96.7c11,0,21-3.9,28.8-10.5l35,35c0.8,0.8,1.8,1.2,2.9,1.2s2.1-0.4,2.9-1.2c1.6-1.6,1.6-4.2,0-5.8l-35-35   c6.5-7.8,10.5-17.9,10.5-28.8c0-24.9-20.2-45.1-45.1-45.1C26.8,6.5,6.5,26.8,6.5,51.6C6.5,76.5,26.8,96.7,51.6,96.7z M51.6,14.7   c20.4,0,36.9,16.6,36.9,36.9C88.5,72,72,88.5,51.6,88.5c-20.4,0-36.9-16.6-36.9-36.9C14.7,31.3,31.3,14.7,51.6,14.7z"
-                ></path>
-              </g>
-            </svg>
-            <input
-              className="w-screen  focus:outline-none text-sm bg-[#161A30] text-white"
-              type="text"
-              placeholder="Search Users by username..."
-            />
-          </div>
         </div>
 
         <div className="flex items-center gap-10">
-          <svg
-            className="w-6 h-6 stroke-current text-white "
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 32 32"
-          >
-            <path
-              className="fill-white"
-              d="M26,21.5L25,20c-1.6-2.4-2.4-5.3-2.4-8.2c0-3.1-2-5.7-4.7-6.5C17.6,4.5,16.8,4,16,4s-1.6,0.5-1.9,1.3
-    c-2.7,0.8-4.7,3.4-4.7,6.5c0,2.9-0.8,5.8-2.4,8.2l-1,1.5c-0.4,0.7,0,1.5,0.8,1.5h18.3C25.9,23,26.4,22.1,26,21.5z"
-            ></path>
-            <path
-              className="fill-white"
-              d="M19,26c0,1.7-1.3,3-3,3s-3-1.3-3-3"
-            ></path>
-          </svg>
-
-          <svg
-            className="w-6 h-6"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3" y2="6"></line>
-            <line x1="3" y1="12" x2="3" y2="12"></line>
-            <line x1="3" y1="18" x2="3" y2="18"></line>
-          </svg>
-
-          <svg
-            className="w-6 h-6"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <defs>
-              <style>
-                {`.a{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;}`}
-              </style>
-            </defs>
-            <title>cog</title>
-            <path
-              className="a"
-              d="M20.254,13.5H22.5a1,1,0,0,0,1-1v-1a1,1,0,0,0-1-1H20.253a11.8,11.8,0,0,0-1-2.922L20.839,5.99a1,1,0,0,0,0-1.414L19.424,3.161a1,1,0,0,0-1.414,0L16.42,4.75a11.769,11.769,0,0,0-2.92-1V1.5a1,1,0,0,0-1-1h-1a1,1,0,0,0-1,1V3.748a11.777,11.777,0,0,0-2.921,1L5.989,3.161a1,1,0,0,0-1.414,0L3.16,4.576a1,1,0,0,0,0,1.414L4.75,7.579a11.821,11.821,0,0,0-1,2.921H1.5a1,1,0,0,0-1,1v1a1,1,0,0,0,1,1H3.746a11.821,11.821,0,0,0,1,2.921l-1.59,1.59a1,1,0,0,0,0,1.414l1.415,1.414a1,1,0,0,0,1.414,0l1.589-1.589A11.8,11.8,0,0,0,10.5,20.254V22.5a1,1,0,0,0,1,1h1a1,1,0,0,0,1-1V20.254a11.8,11.8,0,0,0,2.92-1l1.591,1.589a1,1,0,0,0,1.414,0l1.414-1.414a1,1,0,0,0,0-1.414l-1.589-1.59A11.821,11.821,0,0,0,20.254,13.5Z"
-            ></path>
-            <circle className="a" cx="12" cy="12" r="4.5"></circle>
-          </svg>
           <svg
             className="w-6 h-6 hover:cursor-pointer"
             onClick={Logout}
@@ -224,10 +162,13 @@ export default function Dashboard() {
       </section>
       <section className="grid grid-cols-8 h-screen bg-[#31304D] rounded-xl">
         <div className="flex flex-col gap-10 col-span-2 border-r-[#161A30] p-5 border-r-2 border-opacity-25">
-          <p className="font-bold text-[#B6BBC4] tracking-wider">Messages</p>
+          <p className="font-bold text-[#B6BBC4] tracking-wider">Users</p>
           <div className="space-y-5">
-            <MessagePreview name={"Onat"} surname={"Engin"} />
-            <MessagePreview name={"Deniz"} surname={"Türk"} />
+            {usersList.map((user, index) => (
+              <div key={index}>
+                <MessagePreview name={user.name} surname={user.surname} />
+              </div>
+            ))}
           </div>
         </div>
         <MessageBox />

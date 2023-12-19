@@ -38,7 +38,7 @@ async def register_user(newUser: UserCreate, db: db_dependency):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 
-@router.get("/get/{username}", response_model=UserResponse)
+@router.get("/get/{username}")
 async def get_user(username : str, user_dep: user_dependency, db: db_dependency):
     try:
         user = find_user(db, username)
@@ -47,18 +47,12 @@ async def get_user(username : str, user_dep: user_dependency, db: db_dependency)
             name=user.name,
             surname=user.surname
         )
-        return userResp
+        friendList = get_user_list(db, username)
+        return {"userResp" : userResp, "friendList" : friendList}
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
 
-@router.get("/get-userlist/{username}")
-async def get_user_list(username, user_dep: user_dependency, db: db_dependency):
-    try:
-        userList = get_user_list(db, username)
-        
-        return userList
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+
 @router.post("/revoke")
 async def get_user(user : UserDeleteRequest, user_dep: user_dependency, db: db_dependency):
     try:

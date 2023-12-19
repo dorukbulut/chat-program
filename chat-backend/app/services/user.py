@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import not_
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from app.models.token import Blacklist
@@ -86,4 +87,9 @@ def login_for_access_token(form_data : UserLogin, db):
 
 
 def get_user_list(db, username:str):
-    pass 
+    users = db.query(User.name, User.surname).filter(not_(User.username == username)).all()
+    if not users:
+        return []
+    return users
+
+
