@@ -87,7 +87,7 @@ def login_for_access_token(form_data : UserLogin, db):
 
 
 def get_user_list(db, username:str):
-    users = db.query(User.name, User.surname).filter(not_(User.username == username)).all()
+    users = db.query(User.name, User.surname, User.username).filter(not_(User.username == username)).all()
     if not users:
         return []
     return users

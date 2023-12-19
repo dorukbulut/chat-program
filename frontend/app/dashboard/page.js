@@ -10,6 +10,7 @@ export default function Dashboard() {
     username: "",
   });
 
+  const [currentChat, setCurrentChat] = useState("");
   const [usersList, setUsersList] = useState([]);
 
   const { data } = useSession({
@@ -166,12 +167,21 @@ export default function Dashboard() {
           <div className="space-y-5">
             {usersList.map((user, index) => (
               <div key={index}>
-                <MessagePreview name={user.name} surname={user.surname} />
+                <MessagePreview
+                  user={user}
+                  setUsername={setCurrentChat}
+                  name={user.name}
+                  surname={user.surname}
+                />
               </div>
             ))}
           </div>
         </div>
-        <MessageBox />
+        {currentChat === "" ? (
+          <NoSelectPreview />
+        ) : (
+          <MessageBox setCurrentChat={setCurrentChat} user={currentChat} />
+        )}
       </section>
     </main>
   );

@@ -1,6 +1,12 @@
-export default function MessagePreview({ name, surname }) {
+export default function MessagePreview({ name, surname, user, setUsername }) {
+  const onClick = (e) => {
+    setUsername(user);
+  };
   return (
-    <div className="hover:cursor-pointer bg-[#161A30] p-3 rounded-lg flex items-center place-content-between">
+    <div
+      onClick={onClick}
+      className="hover:cursor-pointer bg-[#161A30] p-3 rounded-lg flex items-center place-content-between"
+    >
       <div className="flex gap-5 items-center ">
         <svg
           id="Layer_1"

@@ -1,5 +1,5 @@
 import { Message } from "@/components";
-export default function MessageBox() {
+export default function MessageBox({ setCurrentChat, user }) {
   return (
     <div className="flex  flex-col col-span-6 space-y-3 grid grid-rows-6 p-5">
       <div className="flex place-content-between items-center row-span-1 bg-[#31304D] ">
@@ -21,7 +21,7 @@ export default function MessageBox() {
           </svg>
           <div>
             <p className="font-extrabold opacity-75 tracking-wide">
-              Enes Sevim
+              {user.name + " " + user.surname}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -80,6 +80,9 @@ export default function MessageBox() {
           </div>
         </div>
         <svg
+          onClick={() => {
+            setCurrentChat("");
+          }}
           version="1.1"
           id="Layer_1"
           xmlns="http://www.w3.org/2000/svg"
