@@ -10,3 +10,4 @@ typing
 python-multipart
 sqlalchemy
 databases[postgresql]
+confluent-kafka

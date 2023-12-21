@@ -6,6 +6,11 @@ from app.utils import get_db
 from app.database import create_tables
 from app.utils.apiVersion import *
 from fastapi.middleware.cors import CORSMiddleware
+from confluent_kafka.admin import AdminClient, NewTopic
+
+new_topic = NewTopic("chat_message", 1, 1)
+kafka_admin = AdminClient({'bootstrap.servers': 'kafka:9092'})
+kafka_admin.create_topics([new_topic])
 
 create_tables()
 app = FastAPI()

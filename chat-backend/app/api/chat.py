@@ -4,6 +4,14 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.websockets import WebSocketDisconnect
 import json
+from confluent_kafka import Producer
+
+
+# Create the KafkaProducer
+producer = Producer({
+    'bootstrap.servers': 'kafka:9092',
+})
+
 
 router = APIRouter()
 
@@ -30,15 +38,21 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                 receiver_user_id = data_dict.get("receiver_user_id", "")
                 message = data_dict.get("message", "")
                 time  = data_dict.get("time", "")
-                name  = data_dict.get("name", "")
-                surname  = data_dict.get("surname", "")
+
+                # Send message to kafka
+                data = {
+                    "sender_id" : user_id,
+                    "receiver_id" : receiver_user_id,
+                    "message_time" : time,
+                    "content" : message
+                }
+                
+                producer.produce('chat_message', value=json.dumps(data))
 
                 # Send the message to the specific receiver if they are connected
                 if receiver_user_id in connections:
                     receiver_websocket = connections[receiver_user_id]
                     resp = {
-                        "name" : name,
-                        "surname": surname,
                         "message" : message,
                         "time":time,
                     }

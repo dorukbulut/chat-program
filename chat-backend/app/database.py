@@ -1,4 +1,3 @@
-# app/database.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -19,6 +18,7 @@ Base = declarative_base()
 # Import your models here so that they are registered with SQLAlchemy
 from app.models.user import User
 from app.models.token import Blacklist
+from app.models.message import Message
 # Create tables in the database
 def create_tables():
     try:
@@ -27,11 +27,13 @@ def create_tables():
             print("PostgreSQL Database connection successful")
 
         # Drop All Tables (including those with relationships)
-        Base.metadata.drop_all(bind=engine, checkfirst=False)
+        try:
+            Base.metadata.drop_all(bind=engine, checkfirst=False)
+        except:
+            print("Cannot Drop")
         # Create tables
         Base.metadata.create_all(bind=engine)
         logging.info("Tables created successfully")
 
     except Exception as e:
         logging.error(f"Error connecting to the database: {str(e)}")
-

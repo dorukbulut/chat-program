@@ -1,5 +1,81 @@
 import { Message } from "@/components";
-export default function MessageBox({ setCurrentChat, user }) {
+import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
+export default function MessageBox({ me, setCurrentChat, user }) {
+  const [messages, setMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [ws, setWs] = useState(null);
+  const { data } = useSession({
+    required: true,
+  });
+  const inputRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  };
+  const chatBoxRef = useRef(null); // Ref for the chat box element
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    const newWs = new WebSocket(
+      `ws://localhost:8000/api/v1/chat/private/${data.user.username}`
+    ); // Adjust URL and client_id as needed
+    setWs(newWs);
+
+    // Connection opened
+    newWs.addEventListener("open", function (event) {
+      console.log("WebSocket connection opened:", event);
+    });
+
+    // Listen for messages from the server
+    newWs.addEventListener("message", function (event) {
+      const newMessage = JSON.parse(event.data);
+
+      newMessage["type"] = "other";
+      newMessage["time"] = new Date(newMessage["time"]);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    // Handle errors
+    newWs.addEventListener("error", function (event) {
+      console.error("WebSocket error:", event);
+    });
+
+    return () => {
+      newWs.close();
+    };
+  }, []);
+
+  const sendMessage = () => {
+    if (ws && messageInput) {
+      const currentDate = new Date();
+      const message = {
+        receiver_user_id: user.username,
+        message: messageInput,
+        time: currentDate,
+      };
+      ws.send(JSON.stringify(message));
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          type: "me",
+          message: messageInput,
+          time: currentDate,
+        },
+      ]);
+      setMessageInput(""); // Clear the input after sending
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  };
   return (
     <div className="flex  flex-col col-span-6 space-y-3 grid grid-rows-6 p-5">
       <div className="flex place-content-between items-center row-span-1 bg-[#31304D] ">
@@ -23,60 +99,6 @@ export default function MessageBox({ setCurrentChat, user }) {
             <p className="font-extrabold opacity-75 tracking-wide">
               {user.name + " " + user.surname}
             </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlnsXlink="http://www.w3.org/1999/xlink"
-              x="0px"
-              y="0px"
-              viewBox="0 0 512 512"
-              style={{
-                enableBackground: "new 0 0 512 512",
-                width: "16px",
-                height: "16px",
-              }}
-              xmlSpace="preserve"
-            >
-              <style>
-                {`
-        .st0{fill:none;stroke:#00D000;stroke-width:15;stroke-miterlimit:10;}
-        .st1{fill:#00D000;}
-        .st2{fill:none;}
-        .st3{fill:#FFFFFF;}
-        .st4{font-family:'ArialMT';}
-        .st5{font-size:250px;}
-      `}
-              </style>
-              <g id="Layer_1">
-                <g id="Layer_2_background">
-                  <g>
-                    <circle
-                      className="st0"
-                      cx="256.0887"
-                      cy="255.7101"
-                      r="239.3491"
-                    ></circle>
-                  </g>
-                </g>
-                <circle
-                  className="st1"
-                  cx="256"
-                  cy="255.7101"
-                  r="222.1893"
-                ></circle>
-              </g>
-              <g id="Layer_2">
-                <rect
-                  x="49.0213"
-                  y="174.9574"
-                  className="st2"
-                  width="407.2979"
-                  height="184.5957"
-                ></rect>
-              </g>
-            </svg>
           </div>
         </div>
         <svg
@@ -103,35 +125,47 @@ export default function MessageBox({ setCurrentChat, user }) {
         </svg>
       </div>
       <div className="grid grid-rows-7  row-span-5">
-        <div className=" overflow-y-auto max-h-[500px] row-span-6 space-y-2 bg-[#443C68] rounded-xl opacity-50">
-          <Message
-            content={{
-              type: "other",
-              name: "Enes",
-              surname: "Sevim",
-              content: "Selam",
-              time: "20:00",
-            }}
-          />
-
-          <Message
-            content={{
-              type: "me",
-              name: "Doruk",
-              surname: "Bulut",
-              content: "Naber",
-              time: "20:00",
-            }}
-          />
+        <div
+          ref={chatBoxRef}
+          className=" overflow-y-auto max-h-[500px] row-span-6 space-y-2 bg-[#443C68] rounded-xl opacity-50"
+        >
+          {messages.map((message, index) => {
+            const currentHour = String(message.time.getHours()).padStart(
+              2,
+              "0"
+            );
+            const currentMinute = String(message.time.getMinutes()).padStart(
+              2,
+              "0"
+            );
+            return (
+              <Message
+                content={{
+                  type: message?.type,
+                  name: message?.type === "me" ? me.name : user.name,
+                  surname: message?.type === "me" ? me.surname : user.surname,
+                  content: message?.message,
+                  time: currentHour + ":" + currentMinute,
+                }}
+              />
+            );
+          })}
         </div>
         <div className="row-span-1 h-[100px] flex mt-8 bg-[#31304D]">
           <div className="flex w-full h-1/2 ">
             <input
               type="text"
+              value={messageInput}
+              ref={inputRef}
+              onKeyDown={handleKeyDown}
+              onChange={(e) => setMessageInput(e.target.value)}
               placeholder="Type your message..."
               className="w-full opacity-75 focus:opacity-100 text-black flex-1 px-4 py-2 rounded-md focus:outline-none focus:ring focus:border-blue-300"
             />
-            <button className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-md ml-2 focus:outline-none focus:ring focus:border-blue-300">
+            <button
+              onClick={sendMessage}
+              className="bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-md ml-2 focus:outline-none focus:ring focus:border-blue-300"
+            >
               <svg
                 version="1.1"
                 id="Icons"

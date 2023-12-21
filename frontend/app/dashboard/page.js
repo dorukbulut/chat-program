@@ -84,65 +84,6 @@ export default function Dashboard() {
             <p className="tracking-wider font-bold text-[#B6BBC4]">
               {user.name + " " + user.surname}
             </p>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="tracking-wider font-light text-[#B6BBC4]">
-                  Online
-                </p>
-                <svg
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
-                  x="0px"
-                  y="0px"
-                  viewBox="0 0 512 512"
-                  style={{
-                    enableBackground: "new 0 0 512 512",
-                    width: "16px",
-                    height: "16px",
-                  }}
-                  xmlSpace="preserve"
-                >
-                  <style>
-                    {`
-        .st0{fill:none;stroke:#00D000;stroke-width:15;stroke-miterlimit:10;}
-        .st1{fill:#00D000;}
-        .st2{fill:none;}
-        .st3{fill:#FFFFFF;}
-        .st4{font-family:'ArialMT';}
-        .st5{font-size:250px;}
-      `}
-                  </style>
-                  <g id="Layer_1">
-                    <g id="Layer_2_background">
-                      <g>
-                        <circle
-                          className="st0"
-                          cx="256.0887"
-                          cy="255.7101"
-                          r="239.3491"
-                        ></circle>
-                      </g>
-                    </g>
-                    <circle
-                      className="st1"
-                      cx="256"
-                      cy="255.7101"
-                      r="222.1893"
-                    ></circle>
-                  </g>
-                  <g id="Layer_2">
-                    <rect
-                      x="49.0213"
-                      y="174.9574"
-                      className="st2"
-                      width="407.2979"
-                      height="184.5957"
-                    ></rect>
-                  </g>
-                </svg>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -164,7 +105,7 @@ export default function Dashboard() {
       <section className="grid grid-cols-8 h-screen bg-[#31304D] rounded-xl">
         <div className="flex flex-col gap-10 col-span-2 border-r-[#161A30] p-5 border-r-2 border-opacity-25">
           <p className="font-bold text-[#B6BBC4] tracking-wider">Users</p>
-          <div className="space-y-5">
+          <div className="space-y-5 overflow-y-auto max-h-[500px]">
             {usersList.map((user, index) => (
               <div key={index}>
                 <MessagePreview
@@ -180,7 +121,11 @@ export default function Dashboard() {
         {currentChat === "" ? (
           <NoSelectPreview />
         ) : (
-          <MessageBox setCurrentChat={setCurrentChat} user={currentChat} />
+          <MessageBox
+            me={user}
+            setCurrentChat={setCurrentChat}
+            user={currentChat}
+          />
         )}
       </section>
     </main>
