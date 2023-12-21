@@ -3,35 +3,12 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
 import { LoginForm } from "@/components";
+import { useAuth, useAxios } from "@/hooks";
 const Login = () => {
   const router = useRouter();
-  const { status } = useSession();
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status]);
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const data = {
-      username: username,
-      password: password,
-    };
-
-    try {
-      const res = await signIn("login", data);
-      console.log(res);
-    } catch (error) {
-      setSubErrors((prevErrors) => {
-        const newErrors = [...prevErrors, error.response.data.detail];
-        const uniqueArray = [...new Set(newErrors)];
-        return uniqueArray;
-      });
-    }
-  };
+  const { auth, storeAuth } = useAuth();
+  const { api } = useAxios();
 
   return (
     <main className="flex flex-col items-center justify-center h-screen gap-10">

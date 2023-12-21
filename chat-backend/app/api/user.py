@@ -25,7 +25,7 @@ async def get_history(username : str, who: str, user_dep: user_dependency, db: d
 async def login(form_data : UserLogin, db: db_dependency, background_tasks: BackgroundTasks):
     try:
         token = login_for_access_token(form_data, db)
-        background_tasks.add_task(delete_entry, db, token.get("access_token"))
+        token["username"] = form_data.username
         return token
     except ValueError as ve:
         raise HTTPException(status_code=401, detail=str(ve))

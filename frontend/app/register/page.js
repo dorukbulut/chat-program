@@ -28,23 +28,6 @@ const Register = () => {
     }
   }, [username, password, name, surname]);
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const data = {
-      username,
-      password,
-      name,
-      surname,
-    };
-
-    try {
-      const res = await api.post("/user/register", data);
-      if (res.status === 200) {
-        redirect("/login");
-      }
-    } catch (error) {}
-  };
-
   return (
     <main className="flex flex-col items-center justify-center h-screen gap-10">
       {/* Title */}

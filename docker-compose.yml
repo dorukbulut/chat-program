@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  frontend:
+    build: ./frontend
+    volumes:
+      - shared-data:/data
+    networks:
+      - app-network
+    ports:
+      - "3000:3000"
   fastapi:
     build: ./chat-backend
     ports:

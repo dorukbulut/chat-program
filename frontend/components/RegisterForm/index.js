@@ -2,14 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAxios } from "@/hooks";
-import { redirect } from "next/navigation";
-
+import { useRouter } from "next/navigation";
 export default function RegisterForm() {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const router = useRouter();
   const [errors, setErrors] = useState([]);
   const [suberrors, setSubErrors] = useState([]);
   const { api } = useAxios();
@@ -39,9 +38,11 @@ export default function RegisterForm() {
     try {
       const res = await api.post("/user/register", data);
       if (res.status === 200) {
-        redirect("/login");
+        router.push("/login");
       }
-    } catch (error) {}
+    } catch (error) {
+      router.push("/login");
+    }
   };
 
   return (

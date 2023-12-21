@@ -1,9 +1,10 @@
 "use client";
-import { useAxios } from "@/hooks";
+import { useAuth, useAxios } from "@/hooks";
 import { useEffect, useState } from "react";
-import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { MessageBox, MessagePreview, NoSelectPreview } from "@/components";
 export default function Dashboard() {
+  const router = useRouter();
   const [user, setUser] = useState({
     name: "",
     surname: "",
@@ -12,47 +13,36 @@ export default function Dashboard() {
 
   const [currentChat, setCurrentChat] = useState("");
   const [usersList, setUsersList] = useState([]);
-
-  const { data } = useSession({
-    required: true,
-  });
-
-  const { api } = useAxios(data?.user?.access_token);
+  const { auth, destroyAuth } = useAuth();
+  const { api } = useAxios(auth?.access_token);
 
   useEffect(() => {
-    if (data) {
+    if (auth) {
       api
-        .get(`/user/get/${data.user.username}`)
+        .get(`/user/get/${auth.username}`)
         .then(async (res) => {
           setUser(res.data.userResp);
           setUsersList(res.data.friendList);
         })
-        .catch(
-          async (err) =>
-            await signOut({
-              callbackUrl: "http://localhost:3000/login",
-              redirect: true,
-            })
-        );
+        .catch(async (err) => {
+          destroyAuth();
+          router.push("/login");
+        });
     }
-  }, [data]);
+  }, [auth]);
   const Logout = async (e) => {
     e.preventDefault();
 
     const reqdata = {
-      token: data.user.access_token,
+      token: auth.access_token,
     };
     try {
       const res = await api.post("/user/revoke", reqdata);
-      await signOut({
-        callbackUrl: "http://localhost:3000/login",
-        redirect: true,
-      });
+      destroyAuth();
+      router.push("/login");
     } catch (error) {
-      await signOut({
-        callbackUrl: "http://localhost:3000/login",
-        redirect: true,
-      });
+      destroyAuth();
+      router.push("/login");
     }
   };
   return (
@@ -106,13 +96,13 @@ export default function Dashboard() {
         <div className="flex flex-col gap-10 col-span-2 border-r-[#161A30] p-5 border-r-2 border-opacity-25">
           <p className="font-bold text-[#B6BBC4] tracking-wider">Users</p>
           <div className="space-y-5 overflow-y-auto max-h-[500px]">
-            {usersList.map((user, index) => (
+            {usersList.map((user_, index) => (
               <div key={index}>
                 <MessagePreview
-                  user={user}
+                  user={user_}
                   setUsername={setCurrentChat}
-                  name={user.name}
-                  surname={user.surname}
+                  name={user_.name}
+                  surname={user_.surname}
                 />
               </div>
             ))}

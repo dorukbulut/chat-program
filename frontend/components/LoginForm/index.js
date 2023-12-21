@@ -1,14 +1,21 @@
 import React from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
-
+import { useAxios, useAuth } from "@/hooks";
+import { useRouter } from "next/navigation";
 export default function LoginForm() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState([]);
   const [suberrors, setSubErrors] = useState([]);
-
+  const { api } = useAxios();
+  const { auth, storeAuth } = useAuth();
+  useEffect(() => {
+    if (auth) {
+      router.push("/dashboard");
+    }
+  }, [auth]);
   useEffect(() => {
     setSubErrors([]);
     if (password === "" || username === "") {
@@ -30,9 +37,15 @@ export default function LoginForm() {
     };
 
     try {
-      const res = await signIn("login", data);
-      console.log(res);
+      const res = await api.post("/user/login", data);
+
+      await storeAuth({
+        access_token: res.data.access_token,
+        username: res.data.username,
+      });
+      window.location.href = "/dashboard";
     } catch (error) {
+      console.log(error);
       setSubErrors((prevErrors) => {
         const newErrors = [...prevErrors, error.response.data.detail];
         const uniqueArray = [...new Set(newErrors)];

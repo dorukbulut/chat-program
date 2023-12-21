@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useSession } from "next-auth/react";
 
 function useAxios(access_token = null) {
   const instance = axios.create({

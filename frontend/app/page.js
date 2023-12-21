@@ -2,16 +2,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/hooks";
 import { useEffect } from "react";
 export default function Home() {
-  const { status } = useSession();
   const router = useRouter();
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
-    }
-  }, [status]);
+  const { auth } = useAuth();
   return (
     <main className="flex flex-col items-center justify-center h-screen gap-10">
       {/*Title*/}
