@@ -12,6 +12,15 @@ router = APIRouter()
 
 
 
+@router.get("/chat-history/{username}/{who}")
+async def get_history(username : str, who: str, user_dep: user_dependency, db: db_dependency):
+    try:
+        messages = get_chat_history(db, username, who)
+        return messages
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    
+
 @router.post("/login", response_model=Token)
 async def login(form_data : UserLogin, db: db_dependency, background_tasks: BackgroundTasks):
     try:

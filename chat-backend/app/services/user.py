@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import not_
+from sqlalchemy import not_, and_, or_
 from sqlalchemy.exc import IntegrityError
 from app.models.user import User
+from app.models.message import Message
 from app.models.token import Blacklist
 from app.schemas.user import UserCreate, UserLogin, Token, UserLogin, UserDeleteRequest
 from fastapi.security import OAuth2PasswordRequestForm
@@ -91,5 +92,17 @@ def get_user_list(db, username:str):
     if not users:
         return []
     return users
+
+
+
+def get_chat_history(db, username:str, who:str ):
+    messages = db.query(Message.content, Message.message_time, Message.sender_id, Message.receiver_id) \
+                .filter(or_(
+                    and_(Message.sender_id == username, Message.receiver_id == who),
+                    and_(Message.sender_id == who, Message.receiver_id == username)
+                )).order_by(Message.message_time).all()
+    if not messages:
+        return []
+    return messages
 
 

@@ -1,6 +1,7 @@
 import { Message } from "@/components";
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useAxios } from "@/hooks";
 export default function MessageBox({ me, setCurrentChat, user }) {
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
@@ -8,6 +9,7 @@ export default function MessageBox({ me, setCurrentChat, user }) {
   const { data } = useSession({
     required: true,
   });
+  const { api } = useAxios(data?.user?.access_token);
   const inputRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -21,6 +23,20 @@ export default function MessageBox({ me, setCurrentChat, user }) {
   }, [messages]);
 
   useEffect(() => {
+    api
+      .get(`/user/chat-history/${data.user.username}/${user.username}`)
+      .then((res) => {
+        const new_data = res.data.map((d) => {
+          return {
+            type: d.sender_id === data.user.username ? "me" : "other",
+            message: d.content,
+            time: new Date(d.message_time),
+          };
+        });
+
+        setMessages(new_data);
+      })
+      .catch((err) => console.log(err));
     const newWs = new WebSocket(
       `ws://localhost:8000/api/v1/chat/private/${data.user.username}`
     ); // Adjust URL and client_id as needed
